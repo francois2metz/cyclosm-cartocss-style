@@ -1,0 +1,7 @@
+version: "3"
+
+services:
+
+  trex:
+    ports:
+      - 6767:6767
