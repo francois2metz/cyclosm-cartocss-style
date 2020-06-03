@@ -18,5 +18,3 @@ services:
     command: serve --config /data/config.toml
     volumes:
       - ./:/data
-    ports:
-      - 6767:6767
