@@ -1,0 +1,22 @@
+version: "3"
+
+services:
+  postgres:
+    image: mdillon/postgis:11
+    environment:
+      POSTGRES_PASSWORD: postgres
+
+  import:
+    build:
+      context: .
+    working_dir: /data
+    volumes:
+      - ./:/data
+
+  trex:
+    image: sourcepole/t-rex
+    command: serve --config /data/config.toml
+    volumes:
+      - ./:/data
+    ports:
+      - 6767:6767

@@ -1,0 +1,204 @@
+# t-rex configuration
+
+[service.mvt]
+viewer = false
+
+[[datasource]]
+dbconn = "postgresql://postgres:postgres@postgres/postgres"
+name = "dbconn"
+default = true
+
+[grid]
+predefined = "web_mercator"
+
+
+[[tileset]]
+name = "cyclo"
+extent = [-1.97743, 47.35058, 4.27231, 49.60482]
+[[tileset.layer]]
+name = "roads"
+table_name = "planet_osm_line"
+geometry_field = "way"
+geometry_type = "LINESTRING"
+srid = 3857
+buffer_size = 0
+#make_valid = true
+simplify = true
+query_limit = 1000
+[[tileset.layer.query]]
+sql = """SELECT
+          way,
+          CASE
+            WHEN highway='raceway' THEN 'track'  -- render raceways as tracks
+            WHEN highway='road' THEN 'residential'  -- render "road" as residential
+            WHEN highway='footway' AND (bicycle='yes' OR bicycle='designated') THEN 'path'
+            WHEN highway='bridleway' AND (bicycle='yes' OR bicycle='designated') THEN 'path'
+            WHEN highway!='bus_guideway' THEN highway
+            ELSE NULL
+          END AS type,
+          access,
+          CASE
+            WHEN tags->'cyclestreet' IN ('yes') THEN 'yes'
+            WHEN tags->'bicycle_road' IN ('yes') THEN 'yes'
+            ELSE 'no'
+          END AS cyclestreet,
+          CASE
+            WHEN oneway IN ('yes', '-1') THEN oneway
+            ELSE 'no'
+          END AS oneway,
+          CASE
+            WHEN tags->'cycleway:left' IN ('track', 'opposite_track') THEN 'track'
+            WHEN tags->'cycleway:left' IN ('lane', 'opposite_lane') THEN 'lane'
+            WHEN tags->'cycleway:left' IN ('share_busway', 'opposite_share_busway', 'shoulder', 'shared_lane') THEN 'busway'
+            WHEN tags->'cycleway:both' IN ('track', 'opposite_track') THEN 'track'
+            WHEN tags->'cycleway:both' IN ('lane', 'opposite_lane') THEN 'lane'
+            WHEN tags->'cycleway:both' IN ('share_busway', 'opposite_share_busway', 'shoulder', 'shared_lane') THEN 'busway'
+            WHEN tags->'cycleway' IN ('track', 'opposite_track') THEN 'track'
+            WHEN tags->'cycleway' IN ('lane', 'opposite_lane') THEN 'lane'
+            WHEN tags->'cycleway' IN ('share_busway', 'opposite_share_busway', 'shoulder', 'shared_lane') THEN 'busway'
+            ELSE NULL
+          END AS cycleway_left_render,
+          CASE
+            WHEN tags->'cycleway:right' IN ('track', 'opposite_track') THEN 'track'
+            WHEN tags->'cycleway:right' IN ('lane', 'opposite_lane') THEN 'lane'
+            WHEN tags->'cycleway:right' IN ('share_busway', 'opposite_share_busway', 'shoulder', 'shared_lane') THEN 'busway'
+            WHEN tags->'cycleway:both' IN ('track', 'opposite_track') THEN 'track'
+            WHEN tags->'cycleway:both' IN ('lane', 'opposite_lane') THEN 'lane'
+            WHEN tags->'cycleway:both' IN ('share_busway', 'opposite_share_busway', 'shoulder', 'shared_lane') THEN 'busway'
+            WHEN tags->'cycleway' IN ('track', 'opposite_track') THEN 'track'
+            WHEN tags->'cycleway' IN ('lane', 'opposite_lane') THEN 'lane'
+            WHEN tags->'cycleway' IN ('share_busway', 'opposite_share_busway', 'shoulder', 'shared_lane') THEN 'busway'
+            ELSE NULL
+          END AS cycleway_right_render,
+          CASE
+            WHEN tags->'cycleway:left:oneway' IS NOT NULL THEN tags->'cycleway:left:oneway'
+            WHEN tags->'cycleway:left' IN ('opposite_lane', 'opposite_track', 'opposite_share_busway') THEN '-1'
+            WHEN tags->'cycleway' IN ('opposite_lane', 'opposite_track', 'opposite_share_busway') THEN '-1'
+            ELSE NULL
+          END AS cycleway_left_oneway,
+          CASE
+            WHEN tags->'cycleway:right:oneway' IS NOT NULL THEN tags->'cycleway:right:oneway'
+            WHEN tags->'cycleway:right' IN ('opposite_lane', 'opposite_track', 'opposite_share_busway') THEN '-1'
+            WHEN tags->'cycleway' IN ('opposite_lane', 'opposite_track', 'opposite_share_busway') THEN '-1'
+            ELSE NULL
+          END AS cycleway_right_oneway,
+          CASE
+            WHEN tags->'segregated' IN ('yes') THEN 'yes'
+            ELSE 'no'
+          END AS segregated,
+          CASE
+            WHEN tags->'oneway:bicycle' IN ('yes', '-1') THEN tags->'oneway:bicycle'
+            ELSE 'no'
+          END AS oneway_bicycle,
+          COALESCE(
+            tags->'ramp:bicycle',
+            tags->'ramp:stroller',
+            tags->'ramp:wheelchair',
+            tags->'ramp:luggage'
+          ) AS has_ramp,
+          CASE
+            WHEN tags->'indoor' IS NULL OR tags->'indoor' = 'no' THEN NULL
+            ELSE TRUE
+          END as indoor,
+          CASE
+            WHEN tunnel IS NULL OR tunnel = 'no' THEN NULL
+            ELSE TRUE
+          END as tunnel,
+          CASE
+            WHEN bridge IS NULL OR bridge = 'no' THEN NULL
+            ELSE TRUE
+          END as bridge,
+          CASE
+            WHEN covered IS NULL OR covered = 'no' THEN NULL
+            ELSE TRUE
+          END as covered,
+          CASE
+            WHEN tags->'description:covid19' IS NOT NULL THEN TRUE
+            ELSE FALSE
+          END as temporary
+        FROM planet_osm_line
+        WHERE (
+                highway = 'cycleway'
+                OR tags->'cycleway' in ('track', 'lane', 'opposite_lane', 'opposite_track', 'share_busway', 'opposite_share_busway', 'shoulder', 'shared_lane')
+                OR tags->'cycleway:right' in ('track', 'lane', 'opposite_lane', 'opposite_track', 'share_busway', 'opposite_share_busway', 'shoulder', 'shared_lane')
+                OR tags->'cycleway:left' in ('track', 'lane', 'opposite_lane', 'opposite_track', 'share_busway', 'opposite_share_busway', 'shoulder', 'shared_lane')
+                OR tags->'cycleway:both' in ('track', 'lane', 'opposite_lane', 'opposite_track', 'share_busway', 'opposite_share_busway', 'shoulder', 'shared_lane')
+                OR COALESCE(tags->'cycleway:right:oneway', tags->'cycleway:left:oneway') IS NOT NULL
+                OR tags->'cyclestreet' = 'yes'
+                OR tags->'bicycle_road' = 'yes'
+                OR tags->'segregated' = 'yes'
+              )
+              AND way && !bbox!
+     """
+[[tileset.layer]]
+name = "poi"
+geometry_field = "way"
+geometry_type = "POINT"
+srid = 3857
+buffer_size = 0
+#make_valid = true
+simplify = true
+query_limit = 1000
+[[tileset.layer.query]]
+sql = """SELECT
+          way,
+          name,
+          access,
+          bicycle,
+          covered,
+          COALESCE(
+            'amenity_' || CASE WHEN amenity IN ('bicycle_rental', 'bicycle_parking', 'bicycle_repair_station', 'compressed_air', 'motorcycle_parking', 'charging_station', 'vending_machine') THEN amenity ELSE NULL END,
+            'shop_' || CASE WHEN tags->'service:bicycle:retail'='yes' OR tags->'service:bicycle:repair'='yes' OR tags->'service:bicycle:rental'='yes' OR tags->'service:bicycle:pump'='yes' OR tags->'service:bicycle:diy'='yes' THEN 'bicycle' ELSE CASE WHEN shop IN ('bicycle') THEN bicycle ELSE NULL END END
+          ) AS feature,
+          CASE
+            WHEN tags->'capacity'~E'^\\d+$' THEN (tags->'capacity')::integer
+            ELSE NULL
+          END AS capacity,
+          tags->'compressed_air' AS compressed_air,
+          tags->'bicycle_parking' as bicycle_parking,
+          tags->'vending' as vending
+        FROM (
+          SELECT
+            way,
+            name,
+            access,
+            bicycle,
+            covered,
+            amenity,
+            shop,
+            man_made,
+            tags
+          FROM planet_osm_point
+          WHERE way && !bbox!
+
+          UNION ALL
+
+          SELECT
+            ST_Centroid(way) AS way,
+            name,
+            access,
+            bicycle,
+            covered,
+            amenity,
+            shop,
+            man_made,
+            tags
+           FROM planet_osm_polygon
+           WHERE way && !bbox!
+        ) AS poi_union
+        WHERE
+          (
+            amenity IN ( 'bicycle_rental', 'bicycle_parking', 'bicycle_repair_station', 'compressed_air')
+            OR tags->'compressed_air'='yes'
+            OR (amenity='motorcycle_parking' AND (bicycle='yes' OR bicycle='designated'))
+            OR (amenity='charging_station' AND (bicycle='yes' OR bicycle='designated'))
+            OR (amenity='vending_machine' AND tags->'vending'='bicycle_tube')
+            OR shop IN ('bicycle')
+            OR man_made IN ('monitoring_station') AND tags->'monitoring:bicycle'='yes'
+          )
+"""
+
+[webserver]
+# Bind address. Use 0.0.0.0 to listen on all adresses.
+bind = "0.0.0.0"
+port = 6767

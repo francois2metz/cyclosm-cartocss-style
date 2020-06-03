@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>CyclOSM vector</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <script src="https://api.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v1.10.0/mapbox-gl.css" rel="stylesheet" />
+<script src='https://github.com/lukasmartinelli/mapbox-gl-inspect/releases/download/v1.3.1/mapbox-gl-inspect.js'></script>
+<link href='https://github.com/lukasmartinelli/mapbox-gl-inspect/releases/download/v1.3.1/mapbox-gl-inspect.css' rel='stylesheet' />
+    <style>
+      body { margin: 0; padding: 0; }
+      #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+
+    <script>
+      mapboxgl.accessToken = 'pk.eyJ1IjoiZnJhbmNvaXMybWV0eiIsImEiOiJjam92dHk0ZHExbGU4M3BvOTFvdmVlcDIyIn0.r7X8EIJqu7AgPHHd7zKajQ';
+
+      const map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/light-v10',
+        center: [2.3601072, 48.876853],
+        zoom: 18,
+        hash: true
+      });
+      map.addControl(new MapboxInspect());
+
+      map.on('load', () => {
+        map.addSource('cyclo', {
+          type: 'vector',
+          url: 'http://localhost:6767/cyclo.json'
+        });
+        const color = [
+          "case",
+          ["get", "temporary"], "orange",
+          "green"
+        ];
+        const offset = 5;
+        const width = 2;
+        const shared = ["lane", "opposite_lane", "busway", "share_busway", "shared_lane"];
+        map.addLayer({
+          source: 'cyclo',
+          id: "left-shared",
+          "type": "line",
+          "source-layer": "roads",
+          "filter": ["all", ["has", "cycleway_left_render"], ["in", "cycleway_left_render", ...shared]],
+          "paint": {
+            "line-dasharray": [4, 1],
+            "line-offset": -offset,
+            "line-color": color,
+            "line-width": width
+          }
+        });
+        map.addLayer({
+          source: 'cyclo',
+          id: "left-noshared",
+          "type": "line",
+          "source-layer": "roads",
+          "filter": ["all", ["has", "cycleway_left_render"], ["!in", "cycleway_left_render", ...shared]],
+          "paint": {
+            "line-offset": -offset,
+            "line-color": color,
+            "line-width": width
+          }
+        });
+        map.addLayer({
+          source: 'cyclo',
+          id: "right-shared",
+          "type": "line",
+          "source-layer": "roads",
+          "filter": ["all", ["has", "cycleway_right_render"], ["in", "cycleway_right_render", ...shared]],
+          "paint": {
+            "line-dasharray": [4, 1],
+            "line-offset": offset,
+            "line-color": color,
+            "line-width": width
+          }
+        });
+        map.addLayer({
+          source: 'cyclo',
+          id: "right-noshared",
+          "type": "line",
+          "source-layer": "roads",
+          "filter": ["all", ["has", "cycleway_right_render"], ["!in", "cycleway_right_render", ...shared]],
+          "paint": {
+            "line-offset": offset,
+            "line-color": color,
+            "line-width": width
+          }
+        });
+        map.addLayer({
+          source: 'cyclo',
+          id: "cycleway",
+          "type": "line",
+          "source-layer": "roads",
+          "filter": ["all", ["!has", "cycleway_right_render"], ["!has", "cycleway_left_render"]],
+          "paint": {
+            "line-color": color,
+            "line-width": width
+          }
+        });
+        map.addLayer({
+          source: 'cyclo',
+          id: "poi-circle",
+          "type": "circle",
+          "source-layer": "poi",
+          "paint": {
+            "circle-color": "green",
+            "circle-radius": 4
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
