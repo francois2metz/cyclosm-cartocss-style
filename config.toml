@@ -17,7 +17,6 @@ name = "cyclo"
 extent = [-1.97743, 47.35058, 4.27231, 49.60482]
 [[tileset.layer]]
 name = "roads"
-table_name = "planet_osm_line"
 geometry_field = "way"
 geometry_type = "LINESTRING"
 srid = 3857
@@ -138,7 +137,7 @@ srid = 3857
 buffer_size = 0
 #make_valid = true
 simplify = true
-query_limit = 1000
+query_limit = 4000
 [[tileset.layer.query]]
 sql = """SELECT
           way,
