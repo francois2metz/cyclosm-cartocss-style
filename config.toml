@@ -146,16 +146,13 @@ sql = """SELECT
           bicycle,
           covered,
           COALESCE(
-            'amenity_' || CASE WHEN amenity IN ('bicycle_rental', 'bicycle_parking', 'bicycle_repair_station', 'compressed_air', 'motorcycle_parking', 'charging_station', 'vending_machine') THEN amenity ELSE NULL END,
-            'shop_' || CASE WHEN tags->'service:bicycle:retail'='yes' OR tags->'service:bicycle:repair'='yes' OR tags->'service:bicycle:rental'='yes' OR tags->'service:bicycle:pump'='yes' OR tags->'service:bicycle:diy'='yes' THEN 'bicycle' ELSE CASE WHEN shop IN ('bicycle') THEN bicycle ELSE NULL END END
+            'amenity_' || CASE WHEN amenity IN ('bicycle_parking', 'motorcycle_parking') THEN amenity ELSE NULL END
           ) AS feature,
           CASE
             WHEN tags->'capacity'~E'^\\d+$' THEN (tags->'capacity')::integer
             ELSE NULL
           END AS capacity,
-          tags->'compressed_air' AS compressed_air,
-          tags->'bicycle_parking' as bicycle_parking,
-          tags->'vending' as vending
+          tags->'bicycle_parking' as bicycle_parking
         FROM (
           SELECT
             way,
@@ -164,8 +161,6 @@ sql = """SELECT
             bicycle,
             covered,
             amenity,
-            shop,
-            man_made,
             tags
           FROM planet_osm_point
           WHERE way && !bbox!
@@ -179,21 +174,14 @@ sql = """SELECT
             bicycle,
             covered,
             amenity,
-            shop,
-            man_made,
             tags
            FROM planet_osm_polygon
            WHERE way && !bbox!
         ) AS poi_union
         WHERE
           (
-            amenity IN ( 'bicycle_rental', 'bicycle_parking', 'bicycle_repair_station', 'compressed_air')
-            OR tags->'compressed_air'='yes'
+            amenity IN ('bicycle_parking')
             OR (amenity='motorcycle_parking' AND (bicycle='yes' OR bicycle='designated'))
-            OR (amenity='charging_station' AND (bicycle='yes' OR bicycle='designated'))
-            OR (amenity='vending_machine' AND tags->'vending'='bicycle_tube')
-            OR shop IN ('bicycle')
-            OR man_made IN ('monitoring_station') AND tags->'monitoring:bicycle'='yes'
           )
 """
 
