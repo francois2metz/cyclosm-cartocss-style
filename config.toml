@@ -23,7 +23,7 @@ srid = 3857
 buffer_size = 0
 #make_valid = true
 simplify = true
-query_limit = 4000
+query_limit = 10000
 [[tileset.layer.query]]
 sql = """SELECT
           way,
