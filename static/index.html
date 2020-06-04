@@ -27,6 +27,15 @@
         hash: true
       });
       map.addControl(new MapboxInspect());
+      const loadImage = (name) => {
+        const img = new Image();
+        img.src = `${name}.svg`;
+        img.addEventListener('load', () => {
+          map.addImage(name, img);
+        });
+      };
+      loadImage('oneway');
+      loadImage('oneway-reverse');
 
       map.on('load', () => {
         map.addSource('cyclo', {
@@ -106,6 +115,21 @@
         });
         map.addLayer({
           source: 'cyclo',
+          id: "cycleway-oneway",
+          "type": "line",
+          "source-layer": "roads",
+          "filter": ["all", ["!has", "right"], ["!has", "left"], ["in", "oneway", "yes", "-1"]],
+          "paint": {
+"line-pattern": [
+              "case",
+              ["==", ["get", "oneway"], "-1"], "oneway-reverse",
+              "oneway"
+            ],
+            "line-width": width * 4
+          }
+        });
+        map.addLayer({
+          source: 'cyclo',
           id: "poi-circle",
           "type": "circle",
           "source-layer": "poi",
@@ -126,22 +150,48 @@
             "text-offset": [0, 1]
           }
         });
-        const img = new Image();
-        img.src = 'oneway.svg';
-        img.addEventListener('load', () => {
-          map.addImage('oneway', img);
-          map.addLayer({
-            source: 'cyclo',
-            id: "cyclo-opposite",
-            "type": "line",
-            "source-layer": "roads",
-            "filter": ["any", ["in", "right", ...opposite], ["in", "left", ...opposite]],
-            "paint": {
-              "line-color": "red",
-              "line-pattern": "oneway",
-              "line-width": width * 3
-            }
-          });
+ map.addLayer({
+          source: 'cyclo',
+          id: "left-oneway",
+          "type": "line",
+          "source-layer": "roads",
+          "filter": ["all", ["has", "left"], ["in", "left", ...shared, ...notShared], ["in", "left_oneway", "yes", "-1"]],
+          "paint": {
+            "line-pattern": [
+              "case",
+              ["==", ["get", "left_oneway"], "-1"], "oneway-reverse",
+              "oneway"
+            ],
+            "line-offset": -offset,
+            "line-width": width * 4
+          }
+        });
+        map.addLayer({
+          source: 'cyclo',
+          id: "right-oneway",
+          "type": "line",
+          "source-layer": "roads",
+          "filter": ["all", ["has", "right"], ["in", "right", ...shared, ...notShared], ["in", "right_oneway", "yes", "-1"]],
+          "paint": {
+            "line-pattern": [
+              "case",
+              ["==", ["get", "right_oneway"], "-1"], "oneway-reverse",
+              "oneway"
+            ],
+            "line-offset": offset,
+            "line-width": width * 3
+          }
+        });
+        map.addLayer({
+          source: 'cyclo',
+          id: "cyclo-opposite",
+          "type": "line",
+          "source-layer": "roads",
+          "filter": ["any", ["in", "right", ...opposite], ["in", "left", ...opposite]],
+          "paint": {
+            "line-pattern": "oneway-reverse",
+            "line-width": width * 3
+          }
         });
       });
     </script>

@@ -89,6 +89,7 @@ sql = """SELECT
           END AS segregated,
           CASE
             WHEN tags->'oneway:bicycle' IN ('yes', '-1') THEN tags->'oneway:bicycle'
+            WHEN oneway IN ('yes', '-1') THEN oneway
             ELSE 'no'
           END AS oneway,
           COALESCE(
