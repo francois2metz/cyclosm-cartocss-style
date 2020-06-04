@@ -149,7 +149,7 @@ sql = """SELECT
             'amenity_' || CASE WHEN amenity IN ('bicycle_parking', 'motorcycle_parking') THEN amenity ELSE NULL END
           ) AS feature,
           CASE
-            WHEN tags->'capacity'~E'^\\d+$' THEN (tags->'capacity')::integer
+            WHEN tags->'capacity'~E'^\\\\d+$' THEN (tags->'capacity')::integer
             ELSE NULL
           END AS capacity,
           tags->'bicycle_parking' as bicycle_parking

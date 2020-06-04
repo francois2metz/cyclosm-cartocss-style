@@ -112,6 +112,18 @@
             "circle-radius": 4
           }
         });
+        map.addLayer({
+          source: 'cyclo',
+          id: "poi-capacity",
+          "type": "symbol",
+          "source-layer": "poi",
+          "minzoom": 17,
+          "layout": {
+            "text-field": ["get", "capacity"],
+            "text-size": 10,
+            "text-offset": [0, 1]
+          }
+        });
       });
     </script>
   </body>
