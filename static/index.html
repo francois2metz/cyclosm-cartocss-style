@@ -189,6 +189,7 @@
           source: 'cyclo',
           id: "cyclo-opposite",
           "type": "line",
+          "minzoom": 15,
           "source-layer": "roads",
           "filter": ["any", ["in", "right", ...opposite], ["in", "left", ...opposite]],
           "paint": {
