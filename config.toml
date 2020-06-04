@@ -140,6 +140,7 @@ geometry_field = "way"
 geometry_type = "POINT"
 srid = 3857
 buffer_size = 0
+minzoom = 16
 #make_valid = true
 simplify = true
 query_limit = 4000
