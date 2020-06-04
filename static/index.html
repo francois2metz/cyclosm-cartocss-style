@@ -48,7 +48,7 @@
           id: "left-shared",
           "type": "line",
           "source-layer": "roads",
-          "filter": ["all", ["has", "cycleway_left_render"], ["in", "cycleway_left_render", ...shared]],
+          "filter": ["all", ["has", "left"], ["in", "left", ...shared]],
           "paint": {
             "line-dasharray": [4, 1],
             "line-offset": -offset,
@@ -61,7 +61,7 @@
           id: "left-noshared",
           "type": "line",
           "source-layer": "roads",
-          "filter": ["all", ["has", "cycleway_left_render"], ["in", "cycleway_left_render", ...notShared]],
+          "filter": ["all", ["has", "left"], ["in", "left", ...notShared]],
           "paint": {
             "line-offset": -offset,
             "line-color": color,
@@ -73,7 +73,7 @@
           id: "right-shared",
           "type": "line",
           "source-layer": "roads",
-          "filter": ["all", ["has", "cycleway_right_render"], ["in", "cycleway_right_render", ...shared]],
+          "filter": ["all", ["has", "right"], ["in", "right", ...shared]],
           "paint": {
             "line-dasharray": [4, 1],
             "line-offset": offset,
@@ -86,7 +86,7 @@
           id: "right-noshared",
           "type": "line",
           "source-layer": "roads",
-          "filter": ["all", ["has", "cycleway_right_render"], ["in", "cycleway_right_render", ...notShared]],
+          "filter": ["all", ["has", "right"], ["in", "right", ...notShared]],
           "paint": {
             "line-offset": offset,
             "line-color": color,
@@ -98,7 +98,7 @@
           id: "cycleway",
           "type": "line",
           "source-layer": "roads",
-          "filter": ["all", ["!has", "cycleway_right_render"], ["!has", "cycleway_left_render"]],
+          "filter": ["all", ["!has", "right"], ["!has", "left"]],
           "paint": {
             "line-color": color,
             "line-width": width
@@ -135,7 +135,7 @@
             id: "cyclo-opposite",
             "type": "line",
             "source-layer": "roads",
-            "filter": ["any", ["in", "cycleway_right_render", ...opposite], ["in", "cycleway_left_render", ...opposite]],
+            "filter": ["any", ["in", "right", ...opposite], ["in", "left", ...opposite]],
             "paint": {
               "line-color": "red",
               "line-pattern": "oneway",
