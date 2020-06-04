@@ -116,11 +116,12 @@
         map.addLayer({
           source: 'cyclo',
           id: "cycleway-oneway",
+          "minzoom": 15,
           "type": "line",
           "source-layer": "roads",
           "filter": ["all", ["!has", "right"], ["!has", "left"], ["in", "oneway", "yes", "-1"]],
           "paint": {
-"line-pattern": [
+            "line-pattern": [
               "case",
               ["==", ["get", "oneway"], "-1"], "oneway-reverse",
               "oneway"
@@ -154,6 +155,7 @@
           source: 'cyclo',
           id: "left-oneway",
           "type": "line",
+          "minzoom": 15,
           "source-layer": "roads",
           "filter": ["all", ["has", "left"], ["in", "left", ...shared, ...notShared], ["in", "left_oneway", "yes", "-1"]],
           "paint": {
@@ -170,6 +172,7 @@
           source: 'cyclo',
           id: "right-oneway",
           "type": "line",
+          "minzoom": 15,
           "source-layer": "roads",
           "filter": ["all", ["has", "right"], ["in", "right", ...shared, ...notShared], ["in", "right_oneway", "yes", "-1"]],
           "paint": {
