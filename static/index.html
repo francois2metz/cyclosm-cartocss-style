@@ -26,7 +26,6 @@
         zoom: 18,
         hash: true
       });
-      map.addControl(new MapboxInspect());
       const loadImage = (name) => {
         const img = new Image();
         img.src = `${name}.svg`;
@@ -38,6 +37,7 @@
       loadImage('oneway-reverse');
 
       map.on('load', () => {
+        map.addControl(new MapboxInspect());
         map.addSource('cyclo', {
           type: 'vector',
           url: '/cyclo.json'
