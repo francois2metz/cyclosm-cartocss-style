@@ -40,7 +40,9 @@
         ];
         const offset = 5;
         const width = 2;
-        const shared = ["lane", "opposite_lane", "busway", "share_busway", "shared_lane"];
+        const notShared = ["track", "shoulder"]
+        const shared = ["lane", "busway", "share_busway", "shared_lane"];
+        const opposite = ["opposite"];
         map.addLayer({
           source: 'cyclo',
           id: "left-shared",
@@ -59,7 +61,7 @@
           id: "left-noshared",
           "type": "line",
           "source-layer": "roads",
-          "filter": ["all", ["has", "cycleway_left_render"], ["!in", "cycleway_left_render", ...shared]],
+          "filter": ["all", ["has", "cycleway_left_render"], ["in", "cycleway_left_render", ...notShared]],
           "paint": {
             "line-offset": -offset,
             "line-color": color,
@@ -84,7 +86,7 @@
           id: "right-noshared",
           "type": "line",
           "source-layer": "roads",
-          "filter": ["all", ["has", "cycleway_right_render"], ["!in", "cycleway_right_render", ...shared]],
+          "filter": ["all", ["has", "cycleway_right_render"], ["in", "cycleway_right_render", ...notShared]],
           "paint": {
             "line-offset": offset,
             "line-color": color,
@@ -123,6 +125,23 @@
             "text-size": 10,
             "text-offset": [0, 1]
           }
+        });
+        const img = new Image();
+        img.src = 'oneway.svg';
+        img.addEventListener('load', () => {
+          map.addImage('oneway', img);
+          map.addLayer({
+            source: 'cyclo',
+            id: "cyclo-opposite",
+            "type": "line",
+            "source-layer": "roads",
+            "filter": ["any", ["in", "cycleway_right_render", ...opposite], ["in", "cycleway_left_render", ...opposite]],
+            "paint": {
+              "line-color": "red",
+              "line-pattern": "oneway",
+              "line-width": width * 3
+            }
+          });
         });
       });
     </script>

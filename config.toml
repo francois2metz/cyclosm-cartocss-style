@@ -55,6 +55,9 @@ sql = """SELECT
             WHEN tags->'cycleway' IN ('track', 'opposite_track') THEN 'track'
             WHEN tags->'cycleway' IN ('lane', 'opposite_lane') THEN 'lane'
             WHEN tags->'cycleway' IN ('share_busway', 'opposite_share_busway', 'shoulder', 'shared_lane') THEN 'busway'
+            WHEN tags->'cycleway' IN ('opposite') THEN 'opposite'
+            WHEN tags->'cycleway:left' IN ('opposite') THEN 'opposite'
+            WHEN tags->'cycleway:both' IN ('opposite') THEN 'opposite'
             ELSE NULL
           END AS cycleway_left_render,
           CASE
@@ -67,6 +70,9 @@ sql = """SELECT
             WHEN tags->'cycleway' IN ('track', 'opposite_track') THEN 'track'
             WHEN tags->'cycleway' IN ('lane', 'opposite_lane') THEN 'lane'
             WHEN tags->'cycleway' IN ('share_busway', 'opposite_share_busway', 'shoulder', 'shared_lane') THEN 'busway'
+            WHEN tags->'cycleway' IN ('opposite') THEN 'opposite'
+            WHEN tags->'cycleway:right' IN ('opposite') THEN 'opposite'
+            WHEN tags->'cycleway:both' IN ('opposite') THEN 'opposite'
             ELSE NULL
           END AS cycleway_right_render,
           CASE
@@ -118,10 +124,10 @@ sql = """SELECT
         FROM planet_osm_line
         WHERE (
                 highway = 'cycleway'
-                OR tags->'cycleway' in ('track', 'lane', 'opposite_lane', 'opposite_track', 'share_busway', 'opposite_share_busway', 'shoulder', 'shared_lane')
-                OR tags->'cycleway:right' in ('track', 'lane', 'opposite_lane', 'opposite_track', 'share_busway', 'opposite_share_busway', 'shoulder', 'shared_lane')
-                OR tags->'cycleway:left' in ('track', 'lane', 'opposite_lane', 'opposite_track', 'share_busway', 'opposite_share_busway', 'shoulder', 'shared_lane')
-                OR tags->'cycleway:both' in ('track', 'lane', 'opposite_lane', 'opposite_track', 'share_busway', 'opposite_share_busway', 'shoulder', 'shared_lane')
+                OR tags->'cycleway' in ('track', 'lane', 'opposite', 'opposite_lane', 'opposite_track', 'share_busway', 'opposite_share_busway', 'shoulder', 'shared_lane')
+                OR tags->'cycleway:right' in ('track', 'lane', 'opposite', 'opposite_lane', 'opposite_track', 'share_busway', 'opposite_share_busway', 'shoulder', 'shared_lane')
+                OR tags->'cycleway:left' in ('track', 'lane', 'opposite', 'opposite_lane', 'opposite_track', 'share_busway', 'opposite_share_busway', 'shoulder', 'shared_lane')
+                OR tags->'cycleway:both' in ('track', 'lane', 'opposite', 'opposite_lane', 'opposite_track', 'share_busway', 'opposite_share_busway', 'shoulder', 'shared_lane')
                 OR COALESCE(tags->'cycleway:right:oneway', tags->'cycleway:left:oneway') IS NOT NULL
                 OR tags->'cyclestreet' = 'yes'
                 OR tags->'bicycle_road' = 'yes'
