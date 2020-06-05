@@ -11,7 +11,6 @@ default = true
 [grid]
 predefined = "web_mercator"
 
-
 [[tileset]]
 name = "cyclo"
 extent = [-1.97743, 47.35058, 4.27231, 49.60482]
@@ -190,6 +189,9 @@ sql = """SELECT
             OR (amenity='motorcycle_parking' AND (bicycle='yes' OR bicycle='designated'))
           )
 """
+
+[cache.file]
+base = "/data/cache"
 
 [webserver]
 # Bind address. Use 0.0.0.0 to listen on all adresses.
