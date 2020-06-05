@@ -48,7 +48,23 @@
           ["get", "temporary"], "orange",
           "green"
         ];
-        const offset = 5;
+        const offset = (minus = 1) => {
+          console.log(minus, [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            11, 0,
+            20, 5 * minus
+          ]);
+          return [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            11, 0,
+            20, 8 * minus
+          ]
+        };
+
         const width = 2;
         const notShared = ["track", "shoulder"]
         const shared = ["lane", "busway", "share_busway", "shared_lane"];
@@ -61,7 +77,7 @@
           "filter": ["all", ["has", "left"], ["in", "left", ...shared]],
           "paint": {
             "line-dasharray": [4, 1],
-            "line-offset": -offset,
+            "line-offset": offset(-1),
             "line-color": color,
             "line-width": width
           }
@@ -73,7 +89,7 @@
           "source-layer": "roads",
           "filter": ["all", ["has", "left"], ["in", "left", ...notShared]],
           "paint": {
-            "line-offset": -offset,
+            "line-offset": offset(-1),
             "line-color": color,
             "line-width": width
           }
@@ -86,7 +102,7 @@
           "filter": ["all", ["has", "right"], ["in", "right", ...shared]],
           "paint": {
             "line-dasharray": [4, 1],
-            "line-offset": offset,
+            "line-offset": offset(),
             "line-color": color,
             "line-width": width
           }
@@ -98,7 +114,7 @@
           "source-layer": "roads",
           "filter": ["all", ["has", "right"], ["in", "right", ...notShared]],
           "paint": {
-            "line-offset": offset,
+            "line-offset": offset(),
             "line-color": color,
             "line-width": width
           }
@@ -165,7 +181,7 @@
               ["==", ["get", "left_oneway"], "-1"], "oneway-reverse",
               "oneway"
             ],
-            "line-offset": -offset,
+            "line-offset": offset(-1),
             "line-width": width * 4
           }
         });
@@ -182,7 +198,7 @@
               ["==", ["get", "right_oneway"], "-1"], "oneway-reverse",
               "oneway"
             ],
-            "line-offset": offset,
+            "line-offset": offset(),
             "line-width": width * 4
           }
         });
