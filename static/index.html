@@ -153,7 +153,13 @@
           "source-layer": "poi",
           "paint": {
             "circle-color": "green",
-            "circle-radius": 4
+            "circle-radius": [
+              'interpolate',
+              ['linear'],
+              ['zoom'],
+              15, 2,
+              20, 7
+            ]
           }
         });
         map.addLayer({
